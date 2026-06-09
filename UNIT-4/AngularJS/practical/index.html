@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AngularJS Practical: Events, Binding, and Validation</title>
+    <!-- AngularJS CDN Library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background-color: #f4f6f9;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        /* Style validation states automatically */
+        input.ng-invalid.ng-touched {
+            border: 2px solid #e74c3c;
+            background-color: #fdf2f2;
+        }
+        input.ng-valid.ng-touched {
+            border: 2px solid #2ecc71;
+            background-color: #f2fdf5;
+        }
+        .error-msg {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .item-list {
+            margin-top: 20px;
+            padding-left: 20px;
+        }
+        .item-list li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<!-- 1. Bootstrap the app using ng-app directive -->
+<body ng-app="practicalApp">
+
+    <div class="container" ng-controller="FormController">
+        <h2>AngularJS Practical Form & Lists</h2>
+        <hr>
+
+        <!-- 2. Form Handling and Validations -->
+        <form name="registrationForm" ng-submit="submitForm(registrationForm.$valid)" novalidate>
+            
+            <!-- Name Field (Required, minlength 3) -->
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" name="name" ng-model="user.name" required ng-minlength="3">
+                <div class="error-msg" ng-show="registrationForm.name.$touched && registrationForm.name.$invalid">
+                    <span ng-show="registrationForm.name.$error.required">Name is required.</span>
+                    <span ng-show="registrationForm.name.$error.minlength">Name must be at least 3 characters.</span>
+                </div>
+            </div>
+
+            <!-- Email Field (Required, format validated) -->
+            <div class="form-group">
+                <label>Email Address:</label>
+                <input type="email" name="email" ng-model="user.email" required>
+                <div class="error-msg" ng-show="registrationForm.email.$touched && registrationForm.email.$invalid">
+                    <span ng-show="registrationForm.email.$error.required">Email is required.</span>
+                    <span ng-show="registrationForm.email.$error.email">Please enter a valid email.</span>
+                </div>
+            </div>
+
+            <!-- Submit Button (Disabled if form is invalid) -->
+            <button type="submit" ng-disabled="registrationForm.$invalid">Register User</button>
+
+        </form>
+
+        <hr>
+
+        <!-- 3. Event Handling (ng-click) and Lists (ng-repeat) -->
+        <h3>Add User Interests</h3>
+        <div class="form-group">
+            <input type="text" ng-model="newInterest" placeholder="Type interest (e.g. Coding)">
+            <button type="button" ng-click="addInterest()" style="margin-top: 10px; background-color: #2ecc71;">Add Interest</button>
+        </div>
+
+        <h4>Interests List ({{ interests.length }} items):</h4>
+        <ul class="item-list">
+            <!-- Loop through the interests array -->
+            <li ng-repeat="item in interests track by $index">
+                {{ item }} 
+                <button type="button" ng-click="removeInterest($index)" style="padding: 2px 6px; font-size: 11px; background-color: #e74c3c; margin-left: 10px;">Remove</button>
+            </li>
+        </ul>
+        <p ng-show="interests.length === 0" style="color: #7f8c8d;">No interests added yet.</p>
+    </div>
+
+    <!-- AngularJS Script Logic -->
+    <script>
+        // 4. Create Module
+        var app = angular.module("practicalApp", []);
+
+        // 5. Register Controller
+        app.controller("FormController", function($scope) {
+            $scope.user = {};
+            $scope.interests = ["Web Design", "Node.js Basics"];
+            $scope.newInterest = "";
+
+            // Form Submit Callback
+            $scope.submitForm = function(isValid) {
+                if (isValid) {
+                    alert("Form successfully validated and submitted!\nName: " + $scope.user.name + "\nEmail: " + $scope.user.email);
+                    // Reset fields
+                    $scope.user = {};
+                    $scope.registrationForm.$setPristine();
+                    $scope.registrationForm.$setUntouched();
+                }
+            };
+
+            // Event handler: Add interest
+            $scope.addInterest = function() {
+                if ($scope.newInterest.trim() !== "") {
+                    $scope.interests.push($scope.newInterest);
+                    $scope.newInterest = ""; // Clear input box
+                }
+            };
+
+            // Event handler: Remove interest
+            $scope.removeInterest = function(index) {
+                $scope.interests.splice(index, 1);
+            };
+        });
+    </script>
+</body>
+</html>
