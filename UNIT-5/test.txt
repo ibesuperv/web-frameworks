@@ -1,0 +1,52 @@
+2.6 
+Cross-Browser Support
+The application discussed in Section 2.5 works correctly with FX3 and IE9 
+browsers. However, it does not work with IE browsers before IE7. Because there 
+are still some people who use IE6 or IE5, making Ajax work with those browsers 
+must be considered.
+The problem with IE5 and IE6 is that they do not support the XHR object 
+named XMLHttpRequest. They do, however, support a similar object with a 
+different name. So, to make Ajax applications operate correctly on both of these 
+earlier browsers and also all contemporary browsers, these differences must be 
+taken into account. The name of the IE5 and IE6 object is Microsoft.XMLHTTP, 
+and it is an ActiveXObject.
+Actually, XMLHTTP is the name of the original object used for asynchronous 
+requests, invented by Microsoft. When Netscape adopted this idea, the company 
+named its object XMLHttpRequest, and other browser makers followed. Finally, 
+in IE7, Microsoft changed to the name used by the others.
+The code to create the original object (used in IE5 and IE6) is as follows:
+xhr = new ActiveXObject("Microsoft.XMLHTTP");
+This code can determine whether XMLHttpRequest is supported by testing 
+window.XMLHttpRequest. If this is null (which would evaluate to false), 
+it is safe to assume that the browser is either IE5 or IE6 and, accordingly, create 
+the XMLHTTP object. The cross-browser version of the getPlace function is as 
+follows:
+// function getPlace
+//   parameter: zip code
+//   action: create the SMLHttpRequest object, register the
+//           handler for onreadystatechange, prepare to send
+422
+Introduction to Ajax
+//           the request (with open), and send the request,
+//           along with the zip code, to the server
+function getPlace(zip) {
+// Get the object for all browsers except IE5 and IE6
+  if (window.XMLHttpRequest)
+    xhr = new XMLHttpRequest();
+// Otherwise get the object for IE5 and IE6
+  else 
+    xhr = new ActiveXObject("Microsoft.XMLHTTP");
+// Register the embedded receiver function as the handler
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      var result = xhr.responseText;
+      var place = result.split(', ');
+      if (document.getElementById("city").value == "")
+        document.getElementById("city").value = place[0];
+      if (document.getElementById("state").value == "")
+        document.getElementById("state").value = place[1];
+    }
+  }
+  xhr.open("GET", "getCityState.php?zip=" + zip);
+  xhr.send(null);
+}

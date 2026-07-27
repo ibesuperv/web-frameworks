@@ -274,10 +274,10 @@ Below is a complete, standalone executable React application demonstrating Contr
         <div className="form-card">
           <h2 style={{ marginTop: 0, color: '#2c3e50' }}>Student Portal (Controlled Forms)</h2>
 
-          <!-- FORM WITH CONTROLLED INPUTS -->
+          {/* FORM WITH CONTROLLED INPUTS */}
           <form onSubmit={handleSubmit} novalidate>
 
-            <!-- FULL NAME INPUT -->
+            {/* FULL NAME INPUT */}
             <div className="form-group">
               <label>Student Full Name *</label>
               <input 
@@ -292,7 +292,7 @@ Below is a complete, standalone executable React application demonstrating Contr
               {errors.fullName && <div className="error-msg">{errors.fullName}</div>}
             </div>
 
-            <!-- EMAIL INPUT -->
+            {/* EMAIL INPUT */}
             <div className="form-group">
               <label>Email Address *</label>
               <input 
@@ -307,7 +307,7 @@ Below is a complete, standalone executable React application demonstrating Contr
               {errors.email && <div className="error-msg">{errors.email}</div>}
             </div>
 
-            <!-- DEPARTMENT SELECT DROPDOWN -->
+            {/* DEPARTMENT SELECT DROPDOWN */}
             <div className="form-group">
               <label>Department</label>
               <select 
@@ -321,13 +321,13 @@ Below is a complete, standalone executable React application demonstrating Contr
               </select>
             </div>
 
-            <!-- UNCONTROLLED COMPONENT DEMO (useRef) -->
+            {/* UNCONTROLLED COMPONENT DEMO (useRef) */}
             <div className="form-group">
               <label>Admin Remarks (Uncontrolled Field via useRef)</label>
               <input type="text" ref={notesRef} placeholder="Optional notes..." />
             </div>
 
-            <!-- CHECKBOX INPUT -->
+            {/* CHECKBOX INPUT */}
             <div className="form-group">
               <label style={{ fontWeight: 'normal' }}>
                 <input 
@@ -341,19 +341,19 @@ Below is a complete, standalone executable React application demonstrating Contr
               {errors.agreeTerms && <div className="error-msg">{errors.agreeTerms}</div>}
             </div>
 
-            <!-- SUBMIT BUTTON -->
+            {/* SUBMIT BUTTON */}
             <button type="submit" className="btn">
               Submit Registration
             </button>
           </form>
 
-          <!-- SYNTHETIC EVENT MONITOR -->
+          {/* SYNTHETIC EVENT MONITOR */}
           <div className="event-log">
             <strong>Synthetic Event Tracker:</strong>
             <div>Last Captured Event: <span style={{ color: '#f1c40f' }}>{lastEventType}</span></div>
           </div>
 
-          <!-- REGISTERED STUDENTS TABLE -->
+          {/* REGISTERED STUDENTS TABLE */}
           {registeredStudents.length > 0 && (
             <div>
               <h3>Registered Students Records</h3>
