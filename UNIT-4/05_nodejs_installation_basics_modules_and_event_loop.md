@@ -125,35 +125,109 @@ console.log("PI Value: " + math.PI);                    // Output: 3.14159
 
 ---
 
-## 4. Node.js Event Loop Architecture & Execution Phases
+## 4. Node.js Event Loop – Six Execution Phases (10 Marks)
 
-The **Event Loop** is an infinite loop inside the **libuv** C library that orchestrates asynchronous non-blocking task execution in Node.js.
+### 4.1 Definition
 
-```mermaid
-flowchart TD
-    Start["Node.js Process Starts"] --> Timers["1. Timers Phase<br/>Executes setTimeout() & setInterval() callbacks"]
-    Timers --> Pending["2. Pending Callbacks Phase<br/>Executes deferred I/O callbacks (e.g. TCP errors)"]
-    Pending --> Idle["3. Idle / Prepare Phase<br/>Internal Node.js maintenance"]
-    Idle --> Poll["4. Poll Phase<br/>Retrieves new I/O events (fs.readFile, incoming HTTP)"]
-    Poll --> Check["5. Check Phase<br/>Executes setImmediate() callbacks immediately"]
-    Check --> Close["6. Close Callbacks Phase<br/>Executes socket.on('close') cleanup callbacks"]
-    Close --> LoopCheck{More Active Handles / Timers?}
-    LoopCheck -->|Yes| Timers
-    LoopCheck -->|No| Exit["Node.js Process Terminates"]
+The Event Loop is an infinite loop in Node.js (implemented using the libuv library) that manages the execution of asynchronous, non-blocking operations. It continuously checks different execution phases and executes the callbacks waiting in each phase.
+
+```text
+ ┌───────────────────────────┐
+   │           timers          │
+   └─────────────┬─────────────┘
+                 │
+                 v
+   ┌───────────────────────────┐
+┌─>│     pending callbacks     │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │       idle, prepare       │
+│  └─────────────┬─────────────┘      ┌───────────────┐
+│  ┌─────────────┴─────────────┐      │   incoming:   │
+│  │           poll            │<─────┤  connections, │
+│  └─────────────┬─────────────┘      │   data, etc.  │
+│  ┌─────────────┴─────────────┐      └───────────────┘
+│  │           check           │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │      close callbacks      │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+└──┤           timers          │
+   └───────────────────────────┘
 ```
 
----
+### 4.2 The Six Execution Phases
 
-### 4.1 Detailed Breakdown of the 6 Event Loop Phases
+#### 1. Timers Phase
+This is the first phase of the Event Loop. It executes callbacks scheduled by:
+- `setTimeout()`
+- `setInterval()`
 
-1. **Timers Phase**: Executes callbacks scheduled by `setTimeout(fn, delay)` and `setInterval(fn, delay)`.
-2. **Pending Callbacks Phase**: Executes I/O callbacks deferred to the next loop iteration (e.g., system-level errors like `ECONNREFUSED`).
-3. **Idle, Prepare Phase**: Used internally by Node.js for engine preparation.
-4. **Poll Phase**: 
-   - Calculates how long it should block and poll for new I/O events.
-   - Processes incoming I/O events (file reading, incoming HTTP network requests, database response returns).
-5. **Check Phase**: Executes callbacks registered with **`setImmediate()`**. `setImmediate()` callbacks run right after the Poll phase completes!
-6. **Close Callbacks Phase**: Executes socket or handle cleanup callbacks (e.g. `socket.on('close', fn)`).
+A timer callback is executed only after the specified minimum delay has elapsed.
+
+##### Example
+```javascript
+setTimeout(() => {
+    console.log("Hello");
+}, 1000);
+```
+**Function:** Executes timer callbacks whose waiting time has completed.
+
+#### 2. Pending Callbacks Phase
+- Executes I/O callbacks deferred to the next Event Loop iteration.
+- Components: Mainly handles certain system-level callbacks and errors (e.g., TCP errors such as `ECONNREFUSED`).
+- This phase is handled internally by Node.js and is rarely used directly by developers.
+
+**Function:** Executes deferred system I/O callbacks.
+
+#### 3. Idle, Prepare Phase
+- Used internally by Node.js.
+- Performs internal preparation before entering the Poll phase.
+- Developers do not directly interact with this phase.
+
+**Function:** Internal preparation for the Event Loop.
+
+#### 4. Poll Phase
+The Poll phase is the most important phase of the Event Loop. It performs two main tasks:
+1. Retrieves and processes new I/O events.
+2. Executes callbacks for completed asynchronous operations.
+
+Examples include:
+- `fs.readFile()`
+- HTTP requests
+- Database responses
+- Network I/O
+
+If there are no pending callbacks, the Poll phase waits for new I/O events before continuing.
+
+**Function:** Processes most asynchronous I/O operations.
+
+#### 5. Check Phase
+Executes callbacks scheduled using:
+- `setImmediate()`
+
+`setImmediate()` callbacks always execute during the Check phase.
+
+##### Example
+```javascript
+setImmediate(() => {
+    console.log("Executed");
+});
+```
+**Function:** Executes `setImmediate()` callbacks after the Poll phase.
+
+#### 6. Close Callbacks Phase
+- Executes callbacks associated with closing sockets or handles.
+- Commonly used with networking operations.
+
+##### Example
+```javascript
+socket.on("close", () => {
+    console.log("Socket Closed");
+});
+```
+**Function:** Executes resource cleanup and close event callbacks.
 
 ---
 
